@@ -4,6 +4,7 @@ import { getCustomRepository, getRepository } from 'typeorm';
 import TransacitonsRepository from '../repositories/TransactionsRepository';
 import Transaction from '../models/Transaction';
 import Category from '../models/Category';
+import AppError from '../errors/AppError';
 
 interface RequestDTO {
   title: string;
@@ -23,13 +24,13 @@ class CreateTransactionService {
     const categoryRepository = getRepository(Category);
 
     if (type.toLowerCase() !== 'income' && type.toLowerCase() !== 'outcome') {
-      throw new Error('Invalid type');
+      throw new AppError('Invalid type', 400);
     }
 
     const balance = await transactionsRepository.getBalance();
 
     if (type.toLowerCase() === 'outcome' && value > balance.total) {
-      throw new Error("You can't spend more than you have.");
+      throw new AppError("You can't spend more than you have.", 400);
     }
 
     let categoryExists = await categoryRepository.findOne({

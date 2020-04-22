@@ -2,6 +2,7 @@
 
 import { getCustomRepository } from 'typeorm';
 import TransactionRepository from '../repositories/TransactionsRepository';
+import AppError from '../errors/AppError';
 
 interface RequestDTO {
   id: string;
@@ -16,7 +17,7 @@ class DeleteTransactionService {
     });
 
     if (!transactionExists) {
-      throw new Error('Transaction do not exists.');
+      throw new AppError('Transaction do not exists.', 400);
     }
 
     await transactionsRepository.delete(id);
