@@ -1,7 +1,6 @@
 import csvParse from 'csv-parse';
 import fs from 'fs';
 import { getRepository, getCustomRepository } from 'typeorm';
-import CreateTransactionService from './CreateTransactionService';
 import TransactionRepository from '../repositories/TransactionsRepository';
 
 import Category from '../models/Category';
@@ -41,10 +40,9 @@ class ImportTransactionsService {
       parseCSV.on('end', resolve);
     });
 
-    const transactionsRepository = getCustomRepository(TransactionRepository);
-
     await fs.promises.unlink(filepath);
 
+    const transactionsRepository = getCustomRepository(TransactionRepository);
     const categoriesRepository = getRepository(Category);
 
     const categories = await categoriesRepository.find();
@@ -61,19 +59,25 @@ class ImportTransactionsService {
       return !categoriesTitleAlreadyInDB.includes(category);
     });
 
-    if (differentCategories.length > 0) {
-      const newCategories = differentCategories.map(category =>
+    const uniqueCategories = differentCategories.filter(
+      (category, i) => differentCategories.indexOf(category) === i,
+    );
+
+    if (uniqueCategories.length > 0) {
+      const newCategories = uniqueCategories.map(category =>
         categoriesRepository.create({ title: category }),
       );
 
       await categoriesRepository.save(newCategories);
     }
 
+    const categoriesUpdated = await categoriesRepository.find();
+
     const transactions = lines.map(transaction => {
-      const categoryIndex = categories.findIndex(
+      const categoryIndex = categoriesUpdated.findIndex(
         category => category.title === transaction.category,
       );
-      const category_id = categories[categoryIndex].id;
+      const category_id = categoriesUpdated[categoryIndex].id;
       return transactionsRepository.create({
         title: transaction.title,
         value: Number(transaction.value),
