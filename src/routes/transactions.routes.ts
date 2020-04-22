@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { getCustomRepository } from 'typeorm';
 import multer from 'multer';
+
 import uploadConfig from '../config/upload';
 
 import TransactionsRepository from '../repositories/TransactionsRepository';
@@ -52,7 +53,7 @@ transactionsRouter.delete('/:id', async (request, response) => {
 
 transactionsRouter.post(
   '/import',
-  upload.single('transaction'),
+  upload.single('file'),
   async (request, response) => {
     const importTransaction = new ImportTransactionsService();
 

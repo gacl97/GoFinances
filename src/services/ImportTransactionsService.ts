@@ -18,7 +18,10 @@ interface TransactionData {
 }
 
 class ImportTransactionsService {
-  public async execute({ filepath }: RequestDTO): Promise<Transaction[]> {
+  async execute({ filepath }: RequestDTO): Promise<Transaction[]> {
+    const transactionsRepository = getCustomRepository(TransactionRepository);
+    const categoriesRepository = getRepository(Category);
+
     const readCSVStream = fs.createReadStream(filepath);
 
     const parseStream = csvParse({
@@ -41,9 +44,6 @@ class ImportTransactionsService {
     });
 
     await fs.promises.unlink(filepath);
-
-    const transactionsRepository = getCustomRepository(TransactionRepository);
-    const categoriesRepository = getRepository(Category);
 
     const categories = await categoriesRepository.find();
 
