@@ -40,7 +40,7 @@ const Import: React.FC = () => {
 
   function submitFile(files: File[]): void {
     const filesUpdated = files.map(file => {
-      console.log(file);
+
       return {
         file,
         name: file.name,
