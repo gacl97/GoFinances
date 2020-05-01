@@ -1,4 +1,4 @@
-![](/frontend/src/assets/logo.svg)
+![](/frontend/src/assets/Design/logo.svg)
 
 ***
 
